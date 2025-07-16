@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mockdup API</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>mockdup.io</h1>
+    <div id="auth-controls">
+      <button id = "login-btn"class="btn" onclick="showLogin()">Login</button>
+      <div id="user-controls" class="hidden" style="position: relative;">
+  <div id="user-hover-label" class="hidden">User Menu</div>
+  <img src="https://th.bing.com/th/id/OIP.Crq9sn3Qu3HyHwPJi2zW8QHaHa?w=179&h=180&c=7&r=0&o=5&cb=iwc2&dpr=1.3&pid=1.7"
+       class="user-icon"
+       alt="User Icon"
+       id="user-icon"
+       onclick="toggleUserMenu()"
+       onmouseover="showHoverLabel()"
+       onmouseout="hideHoverLabel()" />
+  <button onclick="logout()" class="btn small">Logout</button>
+
+  <!-- User dropdown container -->
+  <div id="user-dropdown" class="hidden user-dropdown">
+    <p><strong>User Menu</strong></p>
+    <button onclick="editUserDetails()">Edit User Details</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+    </div>
+  </header>
+
+  <main>
+    <!-- Home Section -->
+    <section id="home-section">
+      <h2>Build Mock REST APIs in Seconds</h2>
+      <p>Create endpoints with mock data powered by Faker.js and ExpressJs</p>
+      <button class="btn" onclick="showSignup()">Get Started</button>
+    </section>
+
+    <!-- Signup Section -->
+    <section id="signup-section" class="hidden">
+      <div class="form-container">
+         <button class="close-btn" onclick="closeAuth()">X</button>
+        <h2>Create Your Account</h2>
+        <div class="social-buttons">
+          <button class="btn google" onclick="mockGoogleSignup()">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google Logo" />
+            Continue with Google
+          </button>
+          <button class="btn linkedin" onclick="mockLinkedInSignup()">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" alt="LinkedIn Logo" />
+            Continue with LinkedIn
+          </button>
+          <button class="btn facebook" onclick="mockFacebookSignup()">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook Logo" />
+            Continue with Facebook
+          </button>
+        </div>
+
+        <div class="divider"><span>or</span></div>
+
+        <form id="signup-form" onsubmit="handleSignup(event)">
+          <input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
+          <input type="email" id="email" name="email" placeholder="Email Address" required />
+          <input type="password" id="password" name="password" placeholder="Password" required />
+          <button type="submit" class="btn primary">Sign Up</button>
+        </form>
+
+        <div class="footer-link">
+          <p>Already have an account? <a href="#" onclick="showLogin()">Sign in</a></p>
+        </div>
+      </div>
+    </section>
+
+   <section id="login-section" class="hidden">
+  <div class="form-container">
+    <button class="close-btn" onclick="closeAuth()">x</button>
+    <h2>Log in</h2>
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <input type="email" id="login-email" placeholder="Email" required>
+      <input type="password" id="login-pass" placeholder="Password" required>
+      <button type="submit" class="btn">Login</button>
+    </form>
+    <p>Don't have an account? <a href="#" onclick="showSignup()">Sign up</a></p>
+  </div>
+</section>
+ <section id="dashboard-section" class="hidden">
+  <!-- Dashboard Header -->
+  <div class="project-header">
+    <h2>Projects</h2>
+    <button class="btn" onclick="openProjectModal()">+</button>
+  </div>
+
+  <!-- Project Creation Modal -->
+  <div id="project-modal" class="hidden modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeProjectModal()">×</span>
+      <h3>Create New Project</h3>
+      <input type="text" id="project-name-input" placeholder="Project Name">
+      <input type="text" id="project-prefix-input" placeholder="API Prefix (optional)">
+      <button class="btn" onclick="handleProjectCreate()">✅ Create</button>
+    </div>
+  </div>
+
+  <!-- Project List -->
+  <div id="project-list" class="project-list"></div>
+
+  <!-- Resource Builder -->
+  <div id="resource-builder" class="hidden">
+    <div class="resource-header">
+      <h3 class="gradient-text">Create Resource in: <span id="current-project-name"></span></h3>
+      <button id="create-resource-btn" class="btn" onclick="showResourceForm()">➕ New Resource</button>
+    </div>
+
+    <div id="resource-create-form" class="hidden">
+      <input type="text" id="resource-name" placeholder="Resource Name (e.g., users)">
+      <div id="fields-container"></div>
+      <button class="btn" onclick="addField()">➕ Add Field</button>
+      <button class="btn primary" onclick="submitResource()">✅ Create Resource</button>
+
+      <div class="row-slider">
+        <label for="num-rows">Rows to generate:</label>
+        <input type="range" id="num-rows" min="1" max="100" value="10" oninput="updateRowCount(this.value)">
+        <span id="row-count">10</span>
+      </div>
+    </div>
+
+    <div id="existing-resources" style="margin-top: 2rem;"></div>
+
+    <div id="endpoint-preview" class="hidden" style="margin-top: 2rem;">
+      <h4 class="gradient-text">Resource Endpoint</h4>
+      <code id="endpoint-url"></code>
+    </div>
+  </div>
+</section>
+
+
+  <!-- Display existing resources -->
+  <div id="existing-resources" style="margin-top: 2rem;"></div>
+</div>
+<div id="endpoint-preview" class="hidden" style="margin-top: 2rem;">
+  <h4 class="gradient-text">Resource Endpoint</h4>
+  <code id="endpoint-url"></code>
+</div>
+
+
+
+
+ </section>
+  <footer>
+    <p>Contact us: <a href="mailto:help@mockdupapi.io">help@mockdupapi.io</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

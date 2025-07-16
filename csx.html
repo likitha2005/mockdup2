@@ -1,0 +1,746 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mockdup API</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      z-index: -1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.3)); }
+      to { filter: drop-shadow(0 0 15px rgba(102, 126, 234, 0.6)); }
+    }
+
+    #auth-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn.small {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .btn.google {
+      background: linear-gradient(45deg, #4285f4, #34a853);
+    }
+
+    .btn.linkedin {
+      background: linear-gradient(45deg, #0077b5, #0e76a8);
+    }
+
+    .btn.facebook {
+      background: linear-gradient(45deg, #1877f2, #42a5f5);
+    }
+
+    .btn.primary {
+      background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    }
+
+    .user-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #667eea;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    }
+
+    .user-icon:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    #home-section {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      margin: 2rem 0;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #home-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(30px, -30px) rotate(180deg); }
+    }
+
+    #home-section h2 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      z-index: 1;
+    }
+
+    #home-section p {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2.5rem;
+      max-width: 450px;
+      margin: 2rem auto;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .social-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .social-buttons .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .social-buttons .btn img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 2rem 0;
+      position: relative;
+    }
+
+    .divider span {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 0 1rem;
+      position: relative;
+      z-index: 1;
+      color: #666;
+    }
+
+    .divider::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #ccc, transparent);
+      z-index: 0;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #999;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff6b6b;
+      transform: rotate(90deg);
+    }
+
+    #dashboard-section {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 20px;
+      margin: 2rem 0;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #dashboard-section h2 {
+      color: #333;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+
+    .field-row input, .field-row select {
+      flex: 1;
+      margin: 0;
+    }
+
+    .field-row button {
+      flex-shrink: 0;
+      background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+      border: none;
+      color: white;
+      padding: 1rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .field-row button:hover {
+      transform: scale(1.1);
+    }
+
+    #endpoint-preview {
+      background: rgba(102, 126, 234, 0.1);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1rem 0;
+      border-left: 4px solid #667eea;
+    }
+
+    #endpoint-preview code {
+      background: rgba(102, 126, 234, 0.1);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      display: inline-block;
+      font-family: 'Fira Code', monospace;
+      font-weight: 500;
+      color: #667eea;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #user-controls {
+      position: relative;
+    }
+
+    #user-hover-label {
+      position: absolute;
+      top: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    #user-hover-label::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid rgba(0, 0, 0, 0.8);
+    }
+
+    .user-dropdown {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+      width: 200px;
+      backdrop-filter: blur(10px);
+      animation: dropDown 0.3s ease-out;
+    }
+
+    @keyframes dropDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .user-dropdown button {
+      background: none;
+      border: none;
+      width: 100%;
+      padding: 0.75rem;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      color: #333;
+    }
+
+    .user-dropdown button:hover {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      transform: translateX(5px);
+    }
+
+    footer {
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      z-index: 50;
+    }
+
+    footer a {
+      color: #667eea;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    footer a:hover {
+      color: #764ba2;
+      text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+    }
+
+    .footer-link {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .footer-link a {
+      color: #667eea;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .footer-link a:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+
+    /* Slider styling */
+    input[type="range"] {
+      width: 100px;
+      height: 8px;
+      border-radius: 5px;
+      background: #ddd;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      main {
+        padding: 1rem;
+      }
+      
+      #home-section h2 {
+        font-size: 2rem;
+      }
+      
+      .form-container {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+      
+      header {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Loading animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Success animation */
+    .success {
+      animation: bounce 0.5s ease-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Hover effects for interactive elements */
+    .interactive {
+      transition: all 0.3s ease;
+    }
+
+    .interactive:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>mockdup.io</h1>
+    <div id="auth-controls">
+      <button id="login-btn" class="btn" onclick="showLogin()">Login</button>
+      <div id="user-controls" class="hidden" style="position: relative;">
+        <div id="user-hover-label" class="hidden">User Menu</div>
+        <img src="https://th.bing.com/th/id/OIP.Crq9sn3Qu3HyHwPJi2zW8QHaHa?w=179&h=180&c=7&r=0&o=5&cb=iwc2&dpr=1.3&pid=1.7"
+             class="user-icon"
+             alt="User Icon"
+             id="user-icon"
+             onclick="toggleUserMenu()"
+             onmouseover="showHoverLabel()"
+             onmouseout="hideHoverLabel()" />
+        <button onclick="logout()" class="btn small">Logout</button>
+
+        <!-- User dropdown container -->
+        <div id="user-dropdown" class="hidden user-dropdown">
+          <p><strong>User Menu</strong></p>
+          <button onclick="editUserDetails()">Edit User Details</button>
+          <button onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Home Section -->
+    <section id="home-section">
+      <h2>Build Mock REST APIs in Seconds</h2>
+      <p>Create endpoints with mock data powered by Faker.js and FastAPI</p>
+      <button class="btn" onclick="showSignup()">Get Started</button>
+    </section>
+
+    <!-- Signup Section -->
+    <section id="signup-section" class="hidden">
+      <div class="form-container">
+        <button class="close-btn" onclick="closeAuth()">×</button>
+        <h2>Create Your Account</h2>
+        <div class="social-buttons">
+          <button class="btn google" onclick="mockGoogleSignup()">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google Logo" />
+            Continue with Google
+          </button>
+          <button class="btn linkedin" onclick="mockLinkedInSignup()">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" alt="LinkedIn Logo" />
+            Continue with LinkedIn
+          </button>
+          <button class="btn facebook" onclick="mockFacebookSignup()">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook Logo" />
+            Continue with Facebook
+          </button>
+        </div>
+
+        <div class="divider"><span>or</span></div>
+
+        <form id="signup-form" onsubmit="handleSignup(event)">
+          <input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
+          <input type="email" id="email" name="email" placeholder="Email Address" required />
+          <input type="password" id="password" name="password" placeholder="Password" required />
+          <button type="submit" class="btn primary">Sign Up</button>
+        </form>
+
+        <div class="footer-link">
+          <p>Already have an account? <a href="#" onclick="showLogin()">Sign in</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Login Section -->
+    <section id="login-section" class="hidden">
+      <div class="form-container">
+        <button class="close-btn" onclick="closeAuth()">×</button>
+        <h2>Log in</h2>
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-pass" placeholder="Password" required>
+        <button class="btn" onclick="mockLogin()">Login</button>
+        <div class="footer-link">
+          <p>Don't have an account? <a href="#" onclick="showSignup()">Sign up</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard-section" class="hidden">
+      <h2 class="gradient-text">Your Projects</h2>
+
+      <!-- Project Creation -->
+      <div class="interactive" style="margin-bottom: 2rem;">
+        <input type="text" id="project-name" placeholder="Project Name (e.g., CRM Tool)">
+        <button class="btn" onclick="createProject()">📁 Create Project</button>
+      </div>
+
+      <!-- Project Selection -->
+      <div style="margin-bottom: 2rem;">
+        <label for="project-select">Select Project:</label>
+        <select id="project-select" onchange="switchProject(this.value)">
+          <option value="">-- Select Project --</option>
+        </select>
+      </div>
+
+      <!-- Base Endpoint Preview -->
+      <div id="base-endpoint-preview" class="hidden" style="margin-bottom: 2rem;">
+        <h3 class="gradient-text">Base Project Endpoint</h3>
+        <div id="endpoint-preview">
+          <code id="base-endpoint-url"></code>
+        </div>
+      </div>
+
+      <hr style="margin: 2rem 0; border: none; height: 1px; background: linear-gradient(90deg, transparent, #ccc, transparent);">
+
+      <!-- Resource Builder -->
+      <div id="resource-builder" class="hidden">
+        <h3 class="gradient-text">Create Resource in: <span id="current-project-name"></span></h3>
+
+        <div style="margin-bottom: 2rem;">
+          <input type="text" id="resource-name" placeholder="Resource Name (e.g., users)">
+          <div id="fields-container"></div>
+
+          <div style="margin: 1rem 0;">
+            <button class="btn" onclick="addField()">➕ Add Field</button>
+            <button class="btn primary" onclick="createResource()">✅ Save Resource</button>
+          </div>
+
+          <!-- Number of Rows Slider -->
+          <div style="margin: 1.5rem 0; display: flex; align-items: center; gap: 1rem;">
+            <label for="num-rows" style="font-weight: 500;">Rows:</label>
+            <input type="range" id="num-rows" min="1" max="100" value="10" oninput="updateRowCount(this.value)">
+            <span id="row-count" style="font-weight: 600; color: #667eea;">10</span>
+          </div>
+        </div>
+
+        <!-- Existing Resources -->
+        <div id="existing-resources" style="margin-top: 2rem;"></div>
+      </div>
+
+      <!-- Resource Endpoint Preview -->
+      <div id="endpoint-preview" class="hidden" style="margin-top: 2rem;">
+        <h4 class="gradient-text">Resource Endpoint</h4>
+        <code id="endpoint-url"></code>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Contact us: <a href="mailto:help@mockdupapi.io">help@mockdupapi.io</a></p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
