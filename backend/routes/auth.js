@@ -6,9 +6,8 @@ const db = require('../config/db');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
-// ---------------------------
 // SIGNUP ROUTE
-// ---------------------------
+
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -36,9 +35,9 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// ---------------------------
+
 // LOGIN ROUTE
-// ---------------------------
+
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 

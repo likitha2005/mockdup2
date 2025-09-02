@@ -7,7 +7,7 @@
 </head>
 <body>
   <header>
-    <h1>mockdup.io</h1>
+    <h1>mockdup</h1>
     <div id="auth-controls">
       <button id = "login-btn"class="btn" onclick="showLogin()">Login</button>
       <div id="user-controls" class="hidden" style="position: relative;">
@@ -35,17 +35,23 @@
   <main>
     <!-- Home Section -->
     <section id="home-section">
-      <h2>Build Mock REST APIs in Seconds</h2>
-      <p>Create endpoints with mock data powered by Faker.js and ExpressJs</p>
-      <button class="btn" onclick="showSignup()">Get Started</button>
-    </section>
+  <img 
+    src="https://th.bing.com/th/id/OIP.E6wqBYYshmKCSOxP_3Q4AQHaHa?w=176&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" 
+    alt="Mock API Icon" 
+    style="width: 250px; height: 250px; vertical-align: middle; margin-bottom: 10px;"
+  >
+  <h2>Build Mock REST APIs in Seconds</h2>
+  <p>Create endpoints with mock data powered by Faker.js and ExpressJs</p>
+  <button class="btn" onclick="showSignup()">Get Started</button>
+  
+</section>
 
     <!-- Signup Section -->
     <section id="signup-section" class="hidden">
       <div class="form-container">
          <button class="close-btn" onclick="closeAuth()">X</button>
         <h2>Create Your Account</h2>
-        <div class="social-buttons">
+        <!--<div class="social-buttons">
           <button class="btn google" onclick="mockGoogleSignup()">
             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google Logo" />
             Continue with Google
@@ -60,7 +66,7 @@
           </button>
         </div>
 
-        <div class="divider"><span>or</span></div>
+        <div class="divider"><span>or</span></div>-->
 
         <form id="signup-form" onsubmit="handleSignup(event)">
           <input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
@@ -151,7 +157,7 @@
 
  </section>
   <footer>
-    <p>Contact us: <a href="mailto:help@mockdupapi.io">help@mockdupapi.io</a></p>
+    <p>Contact us:help@mockdupapi.io <a href="mailto:help@mockdupapi.io"></a></p>
   </footer>
 
   <script src="script.js"></script>

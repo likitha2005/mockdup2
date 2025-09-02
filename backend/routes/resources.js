@@ -33,8 +33,7 @@ router.post('/', verifyToken, (req, res) => {
 });
 
 // Get all resources for a project by prefix
-// Fetch all resources for a project prefix
-// Fetch all resources under a given project prefix
+
 router.get('/:prefix', verifyToken, (req, res) => {
   const { prefix } = req.params;
 

@@ -239,6 +239,10 @@ function deleteProject(id) {
   if (!confirm('Are you sure you want to delete this project?')) return;
 
   const token = localStorage.getItem('token');
+  if (!token) {
+    alert('You must be logged in to delete a project.');
+    return;
+  }
 
   fetch(`/api/projects/${id}`, {
     method: 'DELETE',
@@ -247,18 +251,24 @@ function deleteProject(id) {
     }
   })
     .then(res => {
-      if (!res.ok) throw new Error('Delete failed');
+      if (!res.ok) {
+        return res.json().then(error => {
+          console.error('Delete failed:', error);
+          throw new Error(error.error || 'Delete failed');
+        });
+      }
       return res.json();
     })
     .then(() => {
       alert('Project deleted');
-      fetchProjects();
+      fetchProjects(); // Refresh the list
     })
     .catch(err => {
       console.error(err);
       alert('Unable to delete project.');
     });
 }
+
 
 function openProject(id, name, prefix) {
   currentProject = { id, name, prefix };
@@ -378,11 +388,12 @@ function addField() {
   row.innerHTML = `
     <input type="text" placeholder="Field Name (e.g. email)" class="field-name-input" />
     <select class="field-type-select">
+      <option value="word">String</option>
+      <option value="number">Number</option>
+      <option value="boolean">Boolean</option>
       <option value="name">Name</option>
       <option value="email">Email</option>
       <option value="phone">Phone</option>
-      <option value="number">Number</option>
-      <option value="boolean">Boolean</option>
       <option value="date">Date</option>
       <option value="word">Word</option>
       <option value="uuid">UUID</option>

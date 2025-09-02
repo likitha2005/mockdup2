@@ -24,18 +24,54 @@ router.post('/', verifyToken, (req, res) => {
 
 router.delete('/:id', verifyToken, (req, res) => {
   const { id } = req.params;
-  const userId = req.user.id;            // comes from verifyToken middleware
+  const userId = req.user?.id;
 
-  // Make sure user can delete only their own project
-  const sql = 'DELETE FROM projects WHERE id = ? AND user_id = ?';
-  db.query(sql, [id, userId], (err, result) => {
-    if (err)   return res.status(500).json({ error: 'DB error' });
-    if (result.affectedRows === 0)
-      return res.status(404).json({ error: 'Project not found' });
+  console.log('>> DELETE request for project ID:', id);
+  console.log('>> Authenticated user ID:', userId);
 
-    res.json({ message: 'Project deleted' });
+  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+  // Step 1: Delete fields belonging to resources of this project
+  const deleteFields = `
+    DELETE f FROM fields f
+    JOIN resources r ON f.resource_id = r.id
+    WHERE r.project_id = ?
+  `;
+
+  db.query(deleteFields, [id], (err) => {
+    if (err) {
+      console.error('>> Error deleting fields:', err);
+      return res.status(500).json({ error: 'Failed to delete fields' });
+    }
+
+    // Step 2: Delete resources of the project
+    const deleteResources = 'DELETE FROM resources WHERE project_id = ?';
+    db.query(deleteResources, [id], (err) => {
+      if (err) {
+        console.error('>> Error deleting resources:', err);
+        return res.status(500).json({ error: 'Failed to delete resources' });
+      }
+
+      // Step 3: Delete the project
+      const deleteProject = 'DELETE FROM projects WHERE id = ? AND user_id = ?';
+      db.query(deleteProject, [id, userId], (err, result) => {
+        if (err) {
+          console.error('>> Error deleting project:', err);
+          return res.status(500).json({ error: 'DB error' });
+        }
+
+        if (result.affectedRows === 0) {
+          console.warn('>> Project not found or not owned by user');
+          return res.status(404).json({ error: 'Project not found or unauthorized' });
+        }
+
+        res.json({ message: 'Project deleted successfully' });
+      });
+    });
   });
 });
+
+
 
 
 // Get all projects for user
