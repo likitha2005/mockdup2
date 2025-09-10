@@ -1,6 +1,5 @@
 // =================== Navigation ===================
-// =================== API Base ===================
-const API_BASE_URL = "https://mockdup2.onrender.com"; // <-- Replace with your Render backend URL
+const API_BASE_URL = "https://mockdup2.onrender.com"; // Render backend
 
 function hideAllSections() {
   document.querySelectorAll("main section").forEach(sec => sec.classList.add("hidden"));
@@ -38,9 +37,9 @@ async function handleSignup(event) {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
-  const nameRegex = /^[A-Za-z\s]+$/;
+  const nameRegex = /^[A-Za-z]+$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex = /^(?=.[A-Z])(?=.[a-z])(?=.*\d).{8,}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
 
 
   if (!nameRegex.test(fullname)) return alert("Please enter your full name.");
@@ -48,11 +47,12 @@ async function handleSignup(event) {
   if (!passwordRegex.test(password)) return alert("Password must have 1 uppercase, 1 lowercase, 1 number and 8+ characters.");
 
   try {
-    const response = await fetch(${API_BASE_URL}/api/auth/signup, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: fullname, email, password })
     });
+    
 
     const data = await response.json();
 
@@ -76,18 +76,17 @@ async function handleLogin(event) {
   const password = document.getElementById("login-pass").value;
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex = /^(?=.[A-Z])(?=.[a-z])(?=.*\d).{8,}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
 
   if (!emailRegex.test(email)) return alert("Enter a valid email.");
   if (!passwordRegex.test(password)) return alert("Invalid password format.");
 
-  try {
-    const response = await fetch(${API_BASE_URL}/api/auth/login, {
+ try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-
     const data = await response.json();
 
     if (!response.ok) {
@@ -116,8 +115,8 @@ async function fetchProtectedData() {
   const token = localStorage.getItem('token');
   if (!token) return alert("Not logged in.");
 
-  try {
-    const res = await fetch(${API_BASE_URL}/api/protected, {
+ try {
+    const res = await fetch(`${API_BASE_URL}/api/protected`, {
       headers: {
         'Authorization': 'Bearer ' + token
       }
@@ -137,7 +136,7 @@ async function fetchProtectedData() {
 function createProjectInBackend(name, prefix = '') {
   const token = localStorage.getItem('token');
   
-  fetch(${API_BASE_URL}/api/projects, {
+  fetch(`${API_BASE_URL}/api/projects`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -171,7 +170,7 @@ let currentProject = null;
 function fetchProjects() {
   const token = localStorage.getItem('token');
 
-  fetch(${API_BASE_URL}/api/projects, {
+  fetch(`${API_BASE_URL}/api/projects`, {
     headers: { 'Authorization': 'Bearer ' + token }
   })
     .then(res => res.json())
@@ -223,6 +222,7 @@ function handleProjectCreate() {
 }
 
 
+
 function deleteProject(id) {
   if (!confirm('Are you sure you want to delete this project?')) return;
 
@@ -232,7 +232,7 @@ function deleteProject(id) {
     return;
   }
 
-  fetch(${API_BASE_URL}/api/projects/${id}, {
+  fetch(`${API_BASE_URL}/api/projects/${id}`, {
     method: 'DELETE',
     headers: {
       'Authorization': 'Bearer ' + token
@@ -275,7 +275,7 @@ function fetchResourcesForProject(prefix) {
   const container = document.getElementById("existing-resources");
   container.innerHTML = '';
 
-  fetch(${API_BASE_URL}/api/resources/${prefix}, {
+  fetch(`${API_BASE_URL}/api/resources/${prefix}`, {
     headers: { 'Authorization': 'Bearer ' + token }
   })
     .then(res => res.json())
@@ -295,7 +295,7 @@ function fetchResourcesForProject(prefix) {
         item.className = 'resource-card';
         item.innerHTML = `
           <h4>${resource.name}</h4>
-          <p><strong>Fields:</strong> ${resource.fields.map(f => ${f.name} (${f.type})).join(', ')}</p>
+          <p><strong>Fields:</strong> ${resource.fields.map(f => `${f.name} (${f.type})`).join(', ')}</p>
           <p><strong>Records:</strong> ${resource.count}</p>
           <code>${API_BASE_URL}/api/${prefix}/${resource.name}</code>
         `;
@@ -327,7 +327,7 @@ function submitResource() {
 
   if (fields.length === 0) return alert("Add at least one field");
 
-  fetch(${API_BASE_URL}/api/resources, {
+  fetch(`${API_BASE_URL}/api/resources`, {
     method: 'POST',
     headers: {
       'Authorization': 'Bearer ' + token,
@@ -347,8 +347,8 @@ function submitResource() {
 
         fetchResourcesForProject(currentProject.prefix);
 
-        document.getElementById("endpoint-url").textContent =
-         ${API_BASE_URL}/api/${currentProject.prefix}/${name};
+       document.getElementById("endpoint-url").textContent =
+  `${API_BASE_URL}/api/${currentProject.prefix}/${name}`;
         document.getElementById("endpoint-preview").classList.remove("hidden");
 
         document.getElementById("resource-name").value = '';
